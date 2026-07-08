@@ -56,6 +56,7 @@ FORMULAE=(
 
 MAS=(
     361304891     # Apple Numbers
+    361285480     # Apple Keynote
     361309726     # Apple Pages
     1500855883    # CapCut
 )
