@@ -53,6 +53,13 @@ FORMULAE=(
     mas
 )
 
+
+MAS=(
+    361304891 # Apple Numbers
+    361309726 # Apple Pages
+)
+
+
 ## Functions
 
 log() {
@@ -141,6 +148,9 @@ install_software() {
 
     log "Installing Homebrew casks"
     brew install --cask "${CASKS[@]}"
+
+    log "Installing MAS Apple Appstore"
+    brew install "${MAS[@]}"
 
 }
 
