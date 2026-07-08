@@ -49,6 +49,7 @@ FORMULAE=(
     coreutils
     gh
     qemu
+    rectangle
 )
 
 ## Functions
