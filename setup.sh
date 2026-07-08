@@ -50,6 +50,7 @@ FORMULAE=(
     coreutils
     gh
     qemu
+    mas
 )
 
 ## Functions
