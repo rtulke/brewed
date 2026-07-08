@@ -5,7 +5,7 @@
 # creates an admin user and installs a base set of software.
 #
 # Usage (run directly from GitHub):
-#   curl -fsSL https://raw.githubusercontent.com/<user>/<repo>/main/macos-setup.sh | bash
+#   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/rtulke/brewed/main/macos-setup.sh | bash)"
 #
 # Requirements: Homebrew must be installed, user must have sudo rights.
 
