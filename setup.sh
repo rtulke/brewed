@@ -1,17 +1,15 @@
 #!/usr/bin/env bash
-# ./macos-setup.sh
 #
-# macOS bootstrap script: updates Homebrew, enables the SSH server,
-# creates an admin user and installs a base set of software.
+# macOS bootstrap script
 #
-# Usage (run directly from GitHub):
-#   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/rtulke/brewed/main/macos-setup.sh | bash)"
-#
-# Requirements: Homebrew must be installed, user must have sudo rights.
+# Usage:
+#   bash <(curl -fsSL https://raw.githubusercontent.com/rtulke/brewed/main/setup.sh)
 
 set -euo pipefail
 
-# --- configuration -----------------------------------------------------------
+###############################################################################
+# Configuration
+###############################################################################
 
 NEW_USER="cray"
 NEW_USER_FULLNAME="Robert Tulke"
@@ -54,83 +52,148 @@ FORMULAE=(
     coreutils
     gh
     qemu
-    mc
 )
 
-# --- functions ---------------------------------------------------------------
+###############################################################################
+# Functions
+###############################################################################
 
 log() {
-    printf '\n==> %s\n' "$*"
+    printf "\n==> %s\n" "$*"
+}
+
+warn() {
+    printf "\nWARNING: %s\n" "$*" >&2
+}
+
+die() {
+    printf "\nERROR: %s\n" "$*" >&2
+    exit 1
 }
 
 check_requirements() {
-    if [[ "$(uname -s)" != "Darwin" ]]; then
-        echo "ERROR: this script runs on macOS only." >&2
-        exit 1
-    fi
-    if ! command -v brew >/dev/null 2>&1; then
-        echo "ERROR: Homebrew not found, install it first: https://brew.sh" >&2
-        exit 1
-    fi
+
+    [[ "$(uname -s)" == "Darwin" ]] || die "This script only runs on macOS."
+
+    command -v brew >/dev/null 2>&1 || \
+        die "Homebrew is not installed."
+
 }
 
 update_brew() {
+
     log "Updating Homebrew"
+
     brew update
     brew upgrade
+
 }
 
 setup_ssh() {
-    log "Enabling OpenSSH server (Remote Login)"
-    sudo systemsetup -setremotelogin on
-    sudo systemsetup -getremotelogin
+
+    log "Enable Remote Login (SSH)"
+
+    if sudo systemsetup -setremotelogin on; then
+        sudo systemsetup -getremotelogin
+    else
+        warn "Could not enable Remote Login.
+
+On current versions of macOS, Terminal requires
+'Full Disk Access' before systemsetup may change
+this setting.
+
+System Settings
+→ Privacy & Security
+→ Full Disk Access
+
+Continuing installation..."
+    fi
+
 }
 
 create_user() {
-    if id "${NEW_USER}" >/dev/null 2>&1; then
-        log "User ${NEW_USER} already exists, skipping"
-        return 0
+
+    if id "$NEW_USER" >/dev/null 2>&1; then
+        log "User '$NEW_USER' already exists."
+        return
     fi
-    log "Creating admin user ${NEW_USER}"
-    # read password from /dev/tty so it works when piped via curl | bash
+
+    log "Creating admin user '$NEW_USER'"
+
     local PASSWORD PASSWORD_CONFIRM
-    read -r -s -p "Password for ${NEW_USER}: " PASSWORD < /dev/tty
-    printf '\n'
-    read -r -s -p "Confirm password: " PASSWORD_CONFIRM < /dev/tty
-    printf '\n'
-    if [[ "${PASSWORD}" != "${PASSWORD_CONFIRM}" ]]; then
-        echo "ERROR: passwords do not match." >&2
-        exit 1
-    fi
-    sudo sysadminctl -addUser "${NEW_USER}" \
-        -fullName "${NEW_USER_FULLNAME}" \
-        -password "${PASSWORD}" \
-        -shell "${NEW_USER_SHELL}" \
+
+    read -rsp "Password: " PASSWORD < /dev/tty
+    echo
+
+    read -rsp "Confirm password: " PASSWORD_CONFIRM < /dev/tty
+    echo
+
+    [[ "$PASSWORD" == "$PASSWORD_CONFIRM" ]] || \
+        die "Passwords do not match."
+
+    sudo sysadminctl \
+        -addUser "$NEW_USER" \
+        -fullName "$NEW_USER_FULLNAME" \
+        -password "$PASSWORD" \
+        -shell "$NEW_USER_SHELL" \
         -admin
+
     unset PASSWORD PASSWORD_CONFIRM
+
+    if id "$NEW_USER" >/dev/null 2>&1; then
+        log "User '$NEW_USER' created successfully."
+    else
+        die "User creation failed."
+    fi
+
 }
 
 install_software() {
-    log "Installing casks"
-    for CASK in "${CASKS[@]}"; do
-        brew install --cask "${CASK}" || echo "WARNING: cask ${CASK} failed, continuing"
-    done
 
-    log "Installing formulae"
-    for FORMULA in "${FORMULAE[@]}"; do
-        brew install "${FORMULA}" || echo "WARNING: formula ${FORMULA} failed, continuing"
-    done
+    log "Installing Homebrew formulae"
+
+    brew install "${FORMULAE[@]}"
+
+    log "Installing Homebrew casks"
+
+    brew install --cask "${CASKS[@]}"
+
 }
 
-# --- main --------------------------------------------------------------------
+ask_for_ssh() {
+
+    echo
+    read -rp "Enable Remote Login (SSH)? [y/N] " ANSWER < /dev/tty
+
+    case "$ANSWER" in
+        y|Y|yes|YES)
+            setup_ssh
+            ;;
+        *)
+            log "Skipping SSH configuration."
+            ;;
+    esac
+
+}
+
+###############################################################################
+# Main
+###############################################################################
 
 main() {
+
     check_requirements
+
     update_brew
-    setup_ssh
+
     create_user
+
     install_software
-    log "Done."
+
+    ask_for_ssh
+
+    log "Setup completed successfully."
+
 }
 
 main "$@"
