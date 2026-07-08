@@ -60,6 +60,11 @@ MAS=(
     1500855883    # CapCut
 )
 
+## Pinning software that should not be updated by brew. 
+BREWPINNING=(
+    python
+}
+
 
 ## Functions
 
@@ -87,6 +92,16 @@ update_brew() {
     brew upgrade
 }
 
+setup_commandline_tools() {
+    log "Installing xcode tools"
+    xcode-select --install
+}
+
+setup_brew_pin() {
+    log "Brew Pinning Setup"
+    brew pin python
+    
+}
 setup_ssh() {
 
     log "Enable Remote Login (SSH)"
@@ -150,8 +165,12 @@ install_software() {
     log "Installing Homebrew casks"
     brew install --cask "${CASKS[@]}"
 
+    log "Pinnging Brew Software"
+    brew pin "${BREWPINNING[@]}"
+    
     log "Installing MAS Apple Appstore"
     brew install "${MAS[@]}"
+    
 
 }
 
