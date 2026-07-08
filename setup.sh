@@ -29,6 +29,7 @@ CASKS=(
     whatsapp
     inkscape
     libreoffice
+    rectangle
 )
 
 FORMULAE=(
@@ -49,7 +50,6 @@ FORMULAE=(
     coreutils
     gh
     qemu
-    rectangle
 )
 
 ## Functions
