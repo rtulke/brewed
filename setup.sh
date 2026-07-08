@@ -43,6 +43,7 @@ FORMULAE=(
     fzf
     msmtp
     isync
+    mc
     neomutt
     rename
     tree
