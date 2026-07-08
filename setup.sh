@@ -7,10 +7,7 @@
 
 set -euo pipefail
 
-###############################################################################
-# Configuration
-###############################################################################
-
+## Configuration
 NEW_USER="cray"
 NEW_USER_FULLNAME="Robert Tulke"
 NEW_USER_SHELL="/bin/zsh"
@@ -54,9 +51,7 @@ FORMULAE=(
     qemu
 )
 
-###############################################################################
-# Functions
-###############################################################################
+## Functions
 
 log() {
     printf "\n==> %s\n" "$*"
@@ -72,21 +67,14 @@ die() {
 }
 
 check_requirements() {
-
     [[ "$(uname -s)" == "Darwin" ]] || die "This script only runs on macOS."
-
-    command -v brew >/dev/null 2>&1 || \
-        die "Homebrew is not installed."
-
+    command -v brew >/dev/null 2>&1 || die "Homebrew is not installed."
 }
 
 update_brew() {
-
     log "Updating Homebrew"
-
     brew update
     brew upgrade
-
 }
 
 setup_ssh() {
@@ -108,7 +96,6 @@ System Settings
 
 Continuing installation..."
     fi
-
 }
 
 create_user() {
@@ -118,13 +105,10 @@ create_user() {
         return
     fi
 
-    log "Creating admin user '$NEW_USER'"
-
+    log "Creating admin user '$NEW_USER'" 
     local PASSWORD PASSWORD_CONFIRM
-
-    read -rsp "Password: " PASSWORD < /dev/tty
+    read -rsp "Password: " PASSWORD < /dev/tty    
     echo
-
     read -rsp "Confirm password: " PASSWORD_CONFIRM < /dev/tty
     echo
 
@@ -151,11 +135,9 @@ create_user() {
 install_software() {
 
     log "Installing Homebrew formulae"
-
     brew install "${FORMULAE[@]}"
 
     log "Installing Homebrew casks"
-
     brew install --cask "${CASKS[@]}"
 
 }
@@ -176,24 +158,15 @@ ask_for_ssh() {
 
 }
 
-###############################################################################
-# Main
-###############################################################################
+## Main
 
 main() {
-
     check_requirements
-
     update_brew
-
     create_user
-
     install_software
-
     ask_for_ssh
-
     log "Setup completed successfully."
-
 }
 
 main "$@"
