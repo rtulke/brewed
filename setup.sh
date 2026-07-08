@@ -41,6 +41,9 @@ FORMULAE=(
     trash
     jq
     fzf
+    msmtp
+    isync
+    neomutt
     rename
     tree
     htop
