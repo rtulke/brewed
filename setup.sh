@@ -12,13 +12,16 @@ NEW_USER="cray"
 NEW_USER_FULLNAME="Robert Tulke"
 NEW_USER_SHELL="/bin/zsh"
 
-# The profile is selected from the logged-in user. When the script is started
-# with sudo, SUDO_USER keeps the original user's profile.
+# Installation profiles are selected by a user or hardware SHA-256 checksum.
+# Generate a hardware checksum with:
+#   ioreg -rd1 -c IOPlatformExpertDevice | awk -F'"' '/IOPlatformUUID/ {print $4}' | shasum -a 256 | awk '{print $1}'
 CURRENT_USER="${SUDO_USER:-$(id -un)}"
 CURRENT_USER_HASH="$(printf '%s' "$CURRENT_USER" | shasum -a 256 | awk '{print $1}')"
+CURRENT_HARDWARE_HASH="$(ioreg -rd1 -c IOPlatformExpertDevice | awk -F'"' '/IOPlatformUUID/ {print $4}' | shasum -a 256 | awk '{print $1}')"
 
 ## Profile 1
-PROFILE_1_ID="9f9a47fe61845e5c14fc5462006fc2ec4ab4a2d1e7489241be0a82739080a074"
+PROFILE_1_USER_ID="9f9a47fe61845e5c14fc5462006fc2ec4ab4a2d1e7489241be0a82739080a074"
+PROFILE_1_HARDWARE_ID="3114d797c64da865ab8b6f65d68d1e6b82f6250c50d053efa9dc9dd3e0ce6dc1"
 PROFILE_1_CASKS=(
     telegram
     google-chrome
@@ -69,21 +72,24 @@ PROFILE_1_BREW_PINS=(
 )
 
 ## Profile 2
-PROFILE_2_ID="83fe8e73187b191293cb791192a35de75bebc632ee7e9c33794a722e292330c7"
+PROFILE_2_USER_ID="83fe8e73187b191293cb791192a35de75bebc632ee7e9c33794a722e292330c7"
+PROFILE_2_HARDWARE_ID="3114d797c64da865ab8b6f65d68d1e6b82f6250c50d053efa9dc9dd3e0ce6dc1"
 PROFILE_2_CASKS=()
 PROFILE_2_FORMULAE=()
 PROFILE_2_MAS=()
 PROFILE_2_BREW_PINS=()
 
 ## Profile 3
-PROFILE_3_ID="ec37193df5af8be8cd96f59efdfa5e8b9e8daa2bb3146626322224d9057a2302"
+PROFILE_3_USER_ID="ec37193df5af8be8cd96f59efdfa5e8b9e8daa2bb3146626322224d9057a2302"
+PROFILE_3_HARDWARE_ID="3114d797c64da865ab8b6f65d68d1e6b82f6250c50d053efa9dc9dd3e0ce6dc1"
 PROFILE_3_CASKS=()
 PROFILE_3_FORMULAE=()
 PROFILE_3_MAS=()
 PROFILE_3_BREW_PINS=()
 
 ## Profile 4
-PROFILE_4_ID="e4d6dc0f6e2842e950ae809a86e90456285822d9d350ccc4dae596e0a724d7a3"
+PROFILE_4_USER_ID="e4d6dc0f6e2842e950ae809a86e90456285822d9d350ccc4dae596e0a724d7a3"
+PROFILE_4_HARDWARE_ID="3114d797c64da865ab8b6f65d68d1e6b82f6250c50d053efa9dc9dd3e0ce6dc1"
 PROFILE_4_CASKS=()
 PROFILE_4_FORMULAE=()
 PROFILE_4_MAS=()
@@ -109,41 +115,96 @@ check_requirements() {
     command -v brew >/dev/null 2>&1 || die "Homebrew is not installed."
 }
 
+select_profile() {
+    case "$CURRENT_USER_HASH" in
+        "$PROFILE_1_USER_ID")
+            PROFILE_ID=1
+            PROFILE_SOURCE="user"
+            return
+            ;;
+        "$PROFILE_2_USER_ID")
+            PROFILE_ID=2
+            PROFILE_SOURCE="user"
+            return
+            ;;
+        "$PROFILE_3_USER_ID")
+            PROFILE_ID=3
+            PROFILE_SOURCE="user"
+            return
+            ;;
+        "$PROFILE_4_USER_ID")
+            PROFILE_ID=4
+            PROFILE_SOURCE="user"
+            return
+            ;;
+    esac
+
+    local hardware_matches=0
+
+    if [[ "$CURRENT_HARDWARE_HASH" == "$PROFILE_1_HARDWARE_ID" ]]; then
+        PROFILE_ID=1
+        ((hardware_matches += 1))
+    fi
+
+    if [[ "$CURRENT_HARDWARE_HASH" == "$PROFILE_2_HARDWARE_ID" ]]; then
+        PROFILE_ID=2
+        ((hardware_matches += 1))
+    fi
+
+    if [[ "$CURRENT_HARDWARE_HASH" == "$PROFILE_3_HARDWARE_ID" ]]; then
+        PROFILE_ID=3
+        ((hardware_matches += 1))
+    fi
+
+    if [[ "$CURRENT_HARDWARE_HASH" == "$PROFILE_4_HARDWARE_ID" ]]; then
+        PROFILE_ID=4
+        ((hardware_matches += 1))
+    fi
+
+    ((hardware_matches > 0)) || die "No installation profile configured for this user or device."
+    ((hardware_matches == 1)) || die "Hardware checksum matches multiple profiles. Configure unique hardware checksums."
+
+    PROFILE_SOURCE="hardware"
+}
+
 load_profile() {
     set +u
+    PROFILE_ID=""
+    PROFILE_SOURCE=""
+    select_profile
 
-    case "$CURRENT_USER_HASH" in
-        "$PROFILE_1_ID")
+    case "$PROFILE_ID" in
+        1)
             CASKS=("${PROFILE_1_CASKS[@]}")
             FORMULAE=("${PROFILE_1_FORMULAE[@]}")
             MAS=("${PROFILE_1_MAS[@]}")
             BREWPINNING=("${PROFILE_1_BREW_PINS[@]}")
             ;;
-        "$PROFILE_2_ID")
+        2)
             CASKS=("${PROFILE_2_CASKS[@]}")
             FORMULAE=("${PROFILE_2_FORMULAE[@]}")
             MAS=("${PROFILE_2_MAS[@]}")
             BREWPINNING=("${PROFILE_2_BREW_PINS[@]}")
             ;;
-        "$PROFILE_3_ID")
+        3)
             CASKS=("${PROFILE_3_CASKS[@]}")
             FORMULAE=("${PROFILE_3_FORMULAE[@]}")
             MAS=("${PROFILE_3_MAS[@]}")
             BREWPINNING=("${PROFILE_3_BREW_PINS[@]}")
             ;;
-        "$PROFILE_4_ID")
+        4)
             CASKS=("${PROFILE_4_CASKS[@]}")
             FORMULAE=("${PROFILE_4_FORMULAE[@]}")
             MAS=("${PROFILE_4_MAS[@]}")
             BREWPINNING=("${PROFILE_4_BREW_PINS[@]}")
             ;;
         *)
-            die "No installation profile configured for this user."
+            die "No installation profile selected."
             ;;
     esac
 
     set -u
-    log "Using matching installation profile."
+    log "Using matching installation profile via $PROFILE_SOURCE checksum."
 }
 
 update_brew() {
