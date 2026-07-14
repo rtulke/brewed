@@ -68,9 +68,270 @@ PROFILE_1_BREW_PINS=(
 
 ## Profile 2
 PROFILE_2_HARDWARE_ID="3114d797c64da865ab8b6f65d68d1e6b82f6250c50d053efa9dc9dd3e0ce6dc1"
-PROFILE_2_CASKS=()
-PROFILE_2_FORMULAE=()
-PROFILE_2_MAS=()
+PROFILE_2_CASKS=(
+    adobe-creative-cloud
+    balenaetcher
+    basictex
+    calibre
+    capcut
+    font-raleway
+    chatgpt
+    claude
+    claude-code@latest
+    codex
+    google-chrome
+    google-earth-pro
+    gimp
+    iterm2
+    kindle-create
+    kindle-previewer
+    microsoft-auto-update
+    microsoft-teams
+    mullvad-vpn
+    obsidian
+    raspberry-pi-imager
+    steam
+    telegram
+    threema@beta
+    tor-browser
+    transmit
+    utm
+    visual-studio-code
+    wireshark-app
+)
+
+PROFILE_2_FORMULAE=(
+    ada-url
+    airsnare
+    ansible
+    aom
+    arp-scan
+    brotli
+    btop
+    c-ares
+    ca-certificates
+    cairo
+    cask
+    certifi
+    cffi
+    cmake
+    container-compose
+    coreutils
+    cryptography
+    dav1d
+    deno
+    diffutils
+    emacs
+    ffmpeg
+    flac
+    fmt
+    fontconfig
+    freetype
+    fribidi
+    gdk-pixbuf
+    gemini-cli
+    gettext
+    gh
+    ghostscript
+    giflib
+    gitea
+    glew
+    glib
+    gmp
+    gnutls
+    graphite2
+    groff
+    harfbuzz
+    hashcat
+    hcxtools
+    hdrhistogram_c
+    hermes-agent
+    htop
+    icu4c@78
+    ifstat
+    iftop
+    imagemagick
+    jasper
+    jbig2dec
+    jq
+    jpeg-turbo
+    json-c
+    lame
+    leptonica
+    libarchive
+    libass
+    libavif
+    libb2
+    libbluray
+    libdatrie
+    libde265
+    libevent
+    libffi
+    libgcrypt
+    libgit2
+    libgpg-error
+    libheif
+    libidn
+    libidn2
+    libimagequant
+    liblinear
+    libmaxminddb
+    libnghttp2
+    libnghttp3
+    libngtcp2
+    libogg
+    libpcap
+    libplacebo
+    libpng
+    libraqm
+    librsvg
+    libscrypt
+    libsmi
+    libsndfile
+    libsodium
+    libssh
+    libssh2
+    libtasn1
+    libthai
+    libtiff
+    libtool
+    libudfread
+    libunistring
+    libunibreak
+    libvmaf
+    libvorbis
+    libvpx
+    libx11
+    libxau
+    libxcb
+    libxdmcp
+    libxext
+    libxrender
+    libyaml
+    little-cms2
+    llvm
+    llhttp
+    lua
+    luajit
+    lynx
+    lz4
+    lzo
+    m4
+    mas
+    masscan
+    mdless
+    mdv
+    merve
+    midnight-commander
+    minizip
+    molten-vk
+    mpdecimal
+    mpg123
+    mpv
+    mujs
+    nbytes
+    ncftp
+    ncurses
+    netpbm
+    nettle
+    nmap
+    node
+    oniguruma
+    openjpeg
+    openssl@3
+    openssl@4
+    opus
+    p11-kit
+    pandoc
+    pango
+    pcre2
+    pcre2
+    pillow
+    pixman
+    pkgconf
+    psutils
+    pwgen
+    pycparser
+    pydantic
+    pytest
+    python@3.12
+    python@3.13
+    python@3.14
+    readline
+    rename
+    ripgrep
+    rp
+    rubberband
+    ruby
+    rust
+    s-lang
+    sdl2-compat
+    sdl3
+    sevenzip
+    shaderc
+    shellcheck
+    simdjson
+    simdutf
+    speexdsp
+    sqlite
+    sshscan
+    svt-av1
+    tesseract
+    tor
+    tree
+    tree-sitter
+    tree-sitter@0.25
+    uchardet
+    unbound
+    uvwasi
+    vapoursynth
+    vulkan-headers
+    vulkan-loader
+    webp
+    wget
+    wireshark
+    x264
+    x265
+    xcodegen
+    xorgproto
+    xorriso
+    xxhash
+    xz
+    yt-dlp
+    z3
+    zimg
+    zstd
+)
+
+PROFILE_2_MAS=(
+    1352778147     # Bitwarden
+    1193539993     # Brother iPrint&Scan
+    1388020431     # DevCleaner
+    682658836     # GarageBand
+    1351639930     # Gifski
+    408981434     # iMovie
+    409183694     # Keynote
+    361285480     # Keynote
+    302584613     # Kindle
+    441258766     # Magnet
+    1403919533     # MWeb Pro
+    905953485     # NordVPN
+    409203825     # Numbers
+    361304891     # Numbers
+    1507139439     # One Markdown
+    361309726     # Pages
+    897118787     # Shazam
+    1406961198     # SimpleClient
+    899247664     # TestFlight
+    1450874784     # Transporter
+    1230249825     # VMware Remote Console
+    310633997     # WhatsApp
+    6447090616     # WhisperNotes
+    1295203466     # Windows App
+    1451685025     # WireGuard
+    497799835     # Xcode
+)
+
 PROFILE_2_BREW_PINS=()
 
 ## Profile 3
