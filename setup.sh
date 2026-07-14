@@ -12,15 +12,12 @@ NEW_USER="cray"
 NEW_USER_FULLNAME="Robert Tulke"
 NEW_USER_SHELL="/bin/zsh"
 
-# Installation profiles are selected by a user or hardware SHA-256 checksum.
+# Installation profiles are selected by a hardware SHA-256 checksum.
 # Generate a hardware checksum with:
 #   ioreg -rd1 -c IOPlatformExpertDevice | awk -F'"' '/IOPlatformUUID/ {print $4}' | shasum -a 256 | awk '{print $1}'
-CURRENT_USER="${SUDO_USER:-$(id -un)}"
-CURRENT_USER_HASH="$(printf '%s' "$CURRENT_USER" | shasum -a 256 | awk '{print $1}')"
 CURRENT_HARDWARE_HASH="$(ioreg -rd1 -c IOPlatformExpertDevice | awk -F'"' '/IOPlatformUUID/ {print $4}' | shasum -a 256 | awk '{print $1}')"
 
 ## Profile 1
-PROFILE_1_USER_ID="9f9a47fe61845e5c14fc5462006fc2ec4ab4a2d1e7489241be0a82739080a074"
 PROFILE_1_HARDWARE_ID="0000000000000000000000000000000000000000000000000000000000000001"
 PROFILE_1_CASKS=(
     telegram
@@ -72,7 +69,6 @@ PROFILE_1_BREW_PINS=(
 )
 
 ## Profile 2
-PROFILE_2_USER_ID="83fe8e73187b191293cb791192a35de75bebc632ee7e9c33794a722e292330c7"
 PROFILE_2_HARDWARE_ID="3114d797c64da865ab8b6f65d68d1e6b82f6250c50d053efa9dc9dd3e0ce6dc1"
 PROFILE_2_CASKS=()
 PROFILE_2_FORMULAE=()
@@ -80,7 +76,6 @@ PROFILE_2_MAS=()
 PROFILE_2_BREW_PINS=()
 
 ## Profile 3
-PROFILE_3_USER_ID="ec37193df5af8be8cd96f59efdfa5e8b9e8daa2bb3146626322224d9057a2302"
 PROFILE_3_HARDWARE_ID="0000000000000000000000000000000000000000000000000000000000000002"
 PROFILE_3_CASKS=()
 PROFILE_3_FORMULAE=()
@@ -88,7 +83,6 @@ PROFILE_3_MAS=()
 PROFILE_3_BREW_PINS=()
 
 ## Profile 4
-PROFILE_4_USER_ID="e4d6dc0f6e2842e950ae809a86e90456285822d9d350ccc4dae596e0a724d7a3"
 PROFILE_4_HARDWARE_ID="0000000000000000000000000000000000000000000000000000000000000003"
 PROFILE_4_CASKS=()
 PROFILE_4_FORMULAE=()
@@ -116,29 +110,6 @@ check_requirements() {
 }
 
 select_profile() {
-    case "$CURRENT_USER_HASH" in
-        "$PROFILE_1_USER_ID")
-            PROFILE_ID=1
-            PROFILE_SOURCE="user"
-            return
-            ;;
-        "$PROFILE_2_USER_ID")
-            PROFILE_ID=2
-            PROFILE_SOURCE="user"
-            return
-            ;;
-        "$PROFILE_3_USER_ID")
-            PROFILE_ID=3
-            PROFILE_SOURCE="user"
-            return
-            ;;
-        "$PROFILE_4_USER_ID")
-            PROFILE_ID=4
-            PROFILE_SOURCE="user"
-            return
-            ;;
-    esac
-
     local hardware_matches=0
 
     if [[ "$CURRENT_HARDWARE_HASH" == "$PROFILE_1_HARDWARE_ID" ]]; then
@@ -161,16 +132,13 @@ select_profile() {
         ((hardware_matches += 1))
     fi
 
-    ((hardware_matches > 0)) || die "No installation profile configured for this user or device."
+    ((hardware_matches > 0)) || die "No installation profile configured for this device."
     ((hardware_matches == 1)) || die "Hardware checksum matches multiple profiles. Configure unique hardware checksums."
-
-    PROFILE_SOURCE="hardware"
 }
 
 load_profile() {
     set +u
     PROFILE_ID=""
-    PROFILE_SOURCE=""
     select_profile
 
     case "$PROFILE_ID" in
@@ -204,7 +172,7 @@ load_profile() {
     esac
 
     set -u
-    log "Using matching installation profile via $PROFILE_SOURCE checksum."
+    log "Using matching hardware installation profile."
 }
 
 update_brew() {
@@ -279,14 +247,14 @@ install_software() {
         log "Installing Homebrew formulae"
         brew install "${FORMULAE[@]}"
     else
-        log "No Homebrew formulae configured for '$CURRENT_USER'."
+        log "No Homebrew formulae configured for the selected hardware profile."
     fi
 
     if ((${#CASKS[@]})); then
         log "Installing Homebrew casks"
         brew install --cask "${CASKS[@]}"
     else
-        log "No Homebrew casks configured for '$CURRENT_USER'."
+        log "No Homebrew casks configured for the selected hardware profile."
     fi
 
     if ((${#BREWPINNING[@]})); then
@@ -298,7 +266,7 @@ install_software() {
         log "Installing Mac App Store apps"
         mas install "${MAS[@]}"
     else
-        log "No Mac App Store apps configured for '$CURRENT_USER'."
+        log "No Mac App Store apps configured for the selected hardware profile."
     fi
 }
 
