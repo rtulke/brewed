@@ -12,7 +12,12 @@ NEW_USER="cray"
 NEW_USER_FULLNAME="Robert Tulke"
 NEW_USER_SHELL="/bin/zsh"
 
-CASKS=(
+# The profile is selected from the logged-in user. When the script is started
+# with sudo, SUDO_USER keeps the original user's profile.
+CURRENT_USER="${SUDO_USER:-$(id -un)}"
+
+## Soraya profile
+SORAYA_CASKS=(
     telegram
     google-chrome
     iterm2
@@ -32,7 +37,7 @@ CASKS=(
     rectangle
 )
 
-FORMULAE=(
+SORAYA_FORMULAE=(
     ffmpeg
     trash
     jq
@@ -53,17 +58,34 @@ FORMULAE=(
     mas
 )
 
-MAS=(
+SORAYA_MAS=(
     361304891     # Apple Numbers
     361285480     # Apple Keynote
     361309726     # Apple Pages
     1500855883    # CapCut
 )
 
-## Pinning software that should not be updated by brew.
-BREWPINNING=(
+SORAYA_BREW_PINS=(
     python
 )
+
+## Cray profile
+CRAY_CASKS=()
+CRAY_FORMULAE=()
+CRAY_MAS=()
+CRAY_BREW_PINS=()
+
+## Bennet profile
+BENNET_CASKS=()
+BENNET_FORMULAE=()
+BENNET_MAS=()
+BENNET_BREW_PINS=()
+
+## Bianca profile
+BIANCA_CASKS=()
+BIANCA_FORMULAE=()
+BIANCA_MAS=()
+BIANCA_BREW_PINS=()
 
 ## Functions
 
@@ -83,6 +105,40 @@ die() {
 check_requirements() {
     [[ "$(uname -s)" == "Darwin" ]] || die "This script only runs on macOS."
     command -v brew >/dev/null 2>&1 || die "Homebrew is not installed."
+}
+
+load_profile() {
+    case "$CURRENT_USER" in
+        soraya)
+            CASKS=("${SORAYA_CASKS[@]}")
+            FORMULAE=("${SORAYA_FORMULAE[@]}")
+            MAS=("${SORAYA_MAS[@]}")
+            BREWPINNING=("${SORAYA_BREW_PINS[@]}")
+            ;;
+        cray)
+            CASKS=("${CRAY_CASKS[@]}")
+            FORMULAE=("${CRAY_FORMULAE[@]}")
+            MAS=("${CRAY_MAS[@]}")
+            BREWPINNING=("${CRAY_BREW_PINS[@]}")
+            ;;
+        bennet)
+            CASKS=("${BENNET_CASKS[@]}")
+            FORMULAE=("${BENNET_FORMULAE[@]}")
+            MAS=("${BENNET_MAS[@]}")
+            BREWPINNING=("${BENNET_BREW_PINS[@]}")
+            ;;
+        bianca)
+            CASKS=("${BIANCA_CASKS[@]}")
+            FORMULAE=("${BIANCA_FORMULAE[@]}")
+            MAS=("${BIANCA_MAS[@]}")
+            BREWPINNING=("${BIANCA_BREW_PINS[@]}")
+            ;;
+        *)
+            die "No installation profile configured for user '$CURRENT_USER'."
+            ;;
+    esac
+
+    log "Using installation profile '$CURRENT_USER'."
 }
 
 update_brew() {
@@ -153,17 +209,31 @@ create_user() {
 }
 
 install_software() {
-    log "Installing Homebrew formulae"
-    brew install "${FORMULAE[@]}"
+    if ((${#FORMULAE[@]})); then
+        log "Installing Homebrew formulae"
+        brew install "${FORMULAE[@]}"
+    else
+        log "No Homebrew formulae configured for '$CURRENT_USER'."
+    fi
 
-    log "Installing Homebrew casks"
-    brew install --cask "${CASKS[@]}"
+    if ((${#CASKS[@]})); then
+        log "Installing Homebrew casks"
+        brew install --cask "${CASKS[@]}"
+    else
+        log "No Homebrew casks configured for '$CURRENT_USER'."
+    fi
 
-    log "Pinning Homebrew software"
-    brew pin "${BREWPINNING[@]}"
+    if ((${#BREWPINNING[@]})); then
+        log "Pinning Homebrew software"
+        brew pin "${BREWPINNING[@]}"
+    fi
 
-    log "Installing Mac App Store apps"
-    mas install "${MAS[@]}"
+    if ((${#MAS[@]})); then
+        log "Installing Mac App Store apps"
+        mas install "${MAS[@]}"
+    else
+        log "No Mac App Store apps configured for '$CURRENT_USER'."
+    fi
 }
 
 ask_for_ssh() {
@@ -184,6 +254,7 @@ ask_for_ssh() {
 
 main() {
     check_requirements
+    load_profile
     update_brew
     create_user
     install_software
