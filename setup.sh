@@ -53,7 +53,6 @@ FORMULAE=(
     mas
 )
 
-
 MAS=(
     361304891     # Apple Numbers
     361285480     # Apple Keynote
@@ -61,11 +60,10 @@ MAS=(
     1500855883    # CapCut
 )
 
-## Pinning software that should not be updated by brew. 
+## Pinning software that should not be updated by brew.
 BREWPINNING=(
     python
-}
-
+)
 
 ## Functions
 
@@ -101,10 +99,9 @@ setup_commandline_tools() {
 setup_brew_pin() {
     log "Brew Pinning Setup"
     brew pin python
-    
 }
-setup_ssh() {
 
+setup_ssh() {
     log "Enable Remote Login (SSH)"
 
     if sudo systemsetup -setremotelogin on; then
@@ -125,21 +122,19 @@ Continuing installation..."
 }
 
 create_user() {
-
     if id "$NEW_USER" >/dev/null 2>&1; then
         log "User '$NEW_USER' already exists."
         return
     fi
 
-    log "Creating admin user '$NEW_USER'" 
+    log "Creating admin user '$NEW_USER'"
     local PASSWORD PASSWORD_CONFIRM
-    read -rsp "Password: " PASSWORD < /dev/tty    
+    read -rsp "Password: " PASSWORD < /dev/tty
     echo
     read -rsp "Confirm password: " PASSWORD_CONFIRM < /dev/tty
     echo
 
-    [[ "$PASSWORD" == "$PASSWORD_CONFIRM" ]] || \
-        die "Passwords do not match."
+    [[ "$PASSWORD" == "$PASSWORD_CONFIRM" ]] || die "Passwords do not match."
 
     sudo sysadminctl \
         -addUser "$NEW_USER" \
@@ -155,28 +150,23 @@ create_user() {
     else
         die "User creation failed."
     fi
-
 }
 
 install_software() {
-
     log "Installing Homebrew formulae"
     brew install "${FORMULAE[@]}"
 
     log "Installing Homebrew casks"
     brew install --cask "${CASKS[@]}"
 
-    log "Pinnging Brew Software"
+    log "Pinning Homebrew software"
     brew pin "${BREWPINNING[@]}"
-    
-    log "Installing MAS Apple Appstore"
-    brew install "${MAS[@]}"
-    
 
+    log "Installing Mac App Store apps"
+    mas install "${MAS[@]}"
 }
 
 ask_for_ssh() {
-
     echo
     read -rp "Enable Remote Login (SSH)? [y/N] " ANSWER < /dev/tty
 
@@ -188,7 +178,6 @@ ask_for_ssh() {
             log "Skipping SSH configuration."
             ;;
     esac
-
 }
 
 ## Main
