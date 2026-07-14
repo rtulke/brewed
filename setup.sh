@@ -110,6 +110,8 @@ check_requirements() {
 }
 
 load_profile() {
+    set +u
+
     case "$CURRENT_USER_HASH" in
         "$PROFILE_1_ID")
             CASKS=("${PROFILE_1_CASKS[@]}")
@@ -140,6 +142,7 @@ load_profile() {
             ;;
     esac
 
+    set -u
     log "Using matching installation profile."
 }
 
