@@ -72,22 +72,26 @@ PROFILE_2_CASKS=(
     adobe-creative-cloud
     balenaetcher
     basictex
+    bitwarden
     calibre
     capcut
-    font-raleway
     chatgpt
     claude
     claude-code@latest
     codex
+    devcleaner
+    font-raleway
+    gimp
     google-chrome
     google-earth-pro
-    gimp
     iterm2
     kindle-create
     kindle-previewer
     microsoft-auto-update
     microsoft-teams
     mullvad-vpn
+    mweb-pro
+    nordvpn
     obsidian
     raspberry-pi-imager
     steam
@@ -97,6 +101,8 @@ PROFILE_2_CASKS=(
     transmit
     utm
     visual-studio-code
+    whatsapp
+    windows-app
     wireshark-app
 )
 
@@ -306,19 +312,13 @@ PROFILE_2_FORMULAE=(
 )
 
 PROFILE_2_MAS=(
-    1352778147     # Bitwarden
     1193539993     # Brother iPrint&Scan
-    1388020431     # DevCleaner
     682658836     # GarageBand
     1351639930     # Gifski
     408981434     # iMovie
-    409183694     # Keynote
     361285480     # Keynote
     302584613     # Kindle
     441258766     # Magnet
-    1403919533     # MWeb Pro
-    905953485     # NordVPN
-    409203825     # Numbers
     361304891     # Numbers
     1507139439     # One Markdown
     361309726     # Pages
@@ -327,9 +327,7 @@ PROFILE_2_MAS=(
     899247664     # TestFlight
     1450874784     # Transporter
     1230249825     # VMware Remote Console
-    310633997     # WhatsApp
     6447090616     # WhisperNotes
-    1295203466     # Windows App
     1451685025     # WireGuard
     497799835     # Xcode
 )
