@@ -15,9 +15,11 @@ NEW_USER_SHELL="/bin/zsh"
 # The profile is selected from the logged-in user. When the script is started
 # with sudo, SUDO_USER keeps the original user's profile.
 CURRENT_USER="${SUDO_USER:-$(id -un)}"
+CURRENT_USER_HASH="$(printf '%s' "$CURRENT_USER" | shasum -a 256 | awk '{print $1}')"
 
-## Soraya profile
-SORAYA_CASKS=(
+## Profile 1
+PROFILE_1_ID="9f9a47fe61845e5c14fc5462006fc2ec4ab4a2d1e7489241be0a82739080a074"
+PROFILE_1_CASKS=(
     telegram
     google-chrome
     iterm2
@@ -36,8 +38,7 @@ SORAYA_CASKS=(
     libreoffice
     rectangle
 )
-
-SORAYA_FORMULAE=(
+PROFILE_1_FORMULAE=(
     ffmpeg
     trash
     jq
@@ -57,35 +58,36 @@ SORAYA_FORMULAE=(
     qemu
     mas
 )
-
-SORAYA_MAS=(
+PROFILE_1_MAS=(
     361304891     # Apple Numbers
     361285480     # Apple Keynote
     361309726     # Apple Pages
     1500855883    # CapCut
 )
-
-SORAYA_BREW_PINS=(
+PROFILE_1_BREW_PINS=(
     python
 )
 
-## Cray profile
-CRAY_CASKS=()
-CRAY_FORMULAE=()
-CRAY_MAS=()
-CRAY_BREW_PINS=()
+## Profile 2
+PROFILE_2_ID="83fe8e73187b191293cb791192a35de75bebc632ee7e9c33794a722e292330c7"
+PROFILE_2_CASKS=()
+PROFILE_2_FORMULAE=()
+PROFILE_2_MAS=()
+PROFILE_2_BREW_PINS=()
 
-## Bennet profile
-BENNET_CASKS=()
-BENNET_FORMULAE=()
-BENNET_MAS=()
-BENNET_BREW_PINS=()
+## Profile 3
+PROFILE_3_ID="ec37193df5af8be8cd96f59efdfa5e8b9e8daa2bb3146626322224d9057a2302"
+PROFILE_3_CASKS=()
+PROFILE_3_FORMULAE=()
+PROFILE_3_MAS=()
+PROFILE_3_BREW_PINS=()
 
-## Bianca profile
-BIANCA_CASKS=()
-BIANCA_FORMULAE=()
-BIANCA_MAS=()
-BIANCA_BREW_PINS=()
+## Profile 4
+PROFILE_4_ID="e4d6dc0f6e2842e950ae809a86e90456285822d9d350ccc4dae596e0a724d7a3"
+PROFILE_4_CASKS=()
+PROFILE_4_FORMULAE=()
+PROFILE_4_MAS=()
+PROFILE_4_BREW_PINS=()
 
 ## Functions
 
@@ -108,37 +110,37 @@ check_requirements() {
 }
 
 load_profile() {
-    case "$CURRENT_USER" in
-        soraya)
-            CASKS=("${SORAYA_CASKS[@]}")
-            FORMULAE=("${SORAYA_FORMULAE[@]}")
-            MAS=("${SORAYA_MAS[@]}")
-            BREWPINNING=("${SORAYA_BREW_PINS[@]}")
+    case "$CURRENT_USER_HASH" in
+        "$PROFILE_1_ID")
+            CASKS=("${PROFILE_1_CASKS[@]}")
+            FORMULAE=("${PROFILE_1_FORMULAE[@]}")
+            MAS=("${PROFILE_1_MAS[@]}")
+            BREWPINNING=("${PROFILE_1_BREW_PINS[@]}")
             ;;
-        cray)
-            CASKS=("${CRAY_CASKS[@]}")
-            FORMULAE=("${CRAY_FORMULAE[@]}")
-            MAS=("${CRAY_MAS[@]}")
-            BREWPINNING=("${CRAY_BREW_PINS[@]}")
+        "$PROFILE_2_ID")
+            CASKS=("${PROFILE_2_CASKS[@]}")
+            FORMULAE=("${PROFILE_2_FORMULAE[@]}")
+            MAS=("${PROFILE_2_MAS[@]}")
+            BREWPINNING=("${PROFILE_2_BREW_PINS[@]}")
             ;;
-        bennet)
-            CASKS=("${BENNET_CASKS[@]}")
-            FORMULAE=("${BENNET_FORMULAE[@]}")
-            MAS=("${BENNET_MAS[@]}")
-            BREWPINNING=("${BENNET_BREW_PINS[@]}")
+        "$PROFILE_3_ID")
+            CASKS=("${PROFILE_3_CASKS[@]}")
+            FORMULAE=("${PROFILE_3_FORMULAE[@]}")
+            MAS=("${PROFILE_3_MAS[@]}")
+            BREWPINNING=("${PROFILE_3_BREW_PINS[@]}")
             ;;
-        bianca)
-            CASKS=("${BIANCA_CASKS[@]}")
-            FORMULAE=("${BIANCA_FORMULAE[@]}")
-            MAS=("${BIANCA_MAS[@]}")
-            BREWPINNING=("${BIANCA_BREW_PINS[@]}")
+        "$PROFILE_4_ID")
+            CASKS=("${PROFILE_4_CASKS[@]}")
+            FORMULAE=("${PROFILE_4_FORMULAE[@]}")
+            MAS=("${PROFILE_4_MAS[@]}")
+            BREWPINNING=("${PROFILE_4_BREW_PINS[@]}")
             ;;
         *)
-            die "No installation profile configured for user '$CURRENT_USER'."
+            die "No installation profile configured for this user."
             ;;
     esac
 
-    log "Using installation profile '$CURRENT_USER'."
+    log "Using matching installation profile."
 }
 
 update_brew() {
