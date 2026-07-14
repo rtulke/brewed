@@ -180,11 +180,13 @@ PROFILE_2_FORMULAE=(
     libnghttp3
     libngtcp2
     libogg
+    libpaper
     libpcap
     libplacebo
     libpng
     libraqm
     librsvg
+    libsamplerate
     libscrypt
     libsmi
     libsndfile
