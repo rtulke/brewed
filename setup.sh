@@ -8,8 +8,6 @@
 set -euo pipefail
 
 ## Configuration
-NEW_USER="cray"
-NEW_USER_FULLNAME="Robert Tulke"
 NEW_USER_SHELL="/bin/zsh"
 
 # Installation profiles are selected by a hardware SHA-256 checksum.
@@ -212,34 +210,62 @@ Continuing installation..."
 }
 
 create_user() {
-    if id "$NEW_USER" >/dev/null 2>&1; then
-        log "User '$NEW_USER' already exists."
+    local username="$1"
+    local full_name="$2"
+
+    if id "$username" >/dev/null 2>&1; then
+        log "User '$username' already exists."
         return
     fi
 
-    log "Creating admin user '$NEW_USER'"
-    local PASSWORD PASSWORD_CONFIRM
-    read -rsp "Password: " PASSWORD < /dev/tty
+    log "Creating admin user '$username'"
+    local password password_confirm
+    read -rsp "Password: " password < /dev/tty
     echo
-    read -rsp "Confirm password: " PASSWORD_CONFIRM < /dev/tty
+    read -rsp "Confirm password: " password_confirm < /dev/tty
     echo
 
-    [[ "$PASSWORD" == "$PASSWORD_CONFIRM" ]] || die "Passwords do not match."
+    [[ "$password" == "$password_confirm" ]] || die "Passwords do not match."
 
     sudo sysadminctl \
-        -addUser "$NEW_USER" \
-        -fullName "$NEW_USER_FULLNAME" \
-        -password "$PASSWORD" \
+        -addUser "$username" \
+        -fullName "$full_name" \
+        -password "$password" \
         -shell "$NEW_USER_SHELL" \
         -admin
 
-    unset PASSWORD PASSWORD_CONFIRM
+    unset password password_confirm
 
-    if id "$NEW_USER" >/dev/null 2>&1; then
-        log "User '$NEW_USER' created successfully."
+    if id "$username" >/dev/null 2>&1; then
+        log "User '$username' created successfully."
     else
         die "User creation failed."
     fi
+}
+
+ask_for_user_creation() {
+    local answer username full_name
+
+    echo
+    read -rp "Create an additional admin user? [y/N] " answer < /dev/tty
+
+    case "$answer" in
+        y|Y|yes|YES)
+            ;;
+        *)
+            log "Skipping additional user creation."
+            return
+            ;;
+    esac
+
+    read -rp "Username: " username < /dev/tty
+    [[ -n "$username" ]] || die "Username must not be empty."
+    [[ "$username" =~ ^[A-Za-z0-9._-]+$ ]] || die "Username contains unsupported characters."
+
+    read -rp "Full name: " full_name < /dev/tty
+    [[ -n "$full_name" ]] || die "Full name must not be empty."
+
+    create_user "$username" "$full_name"
 }
 
 install_software() {
@@ -290,7 +316,7 @@ main() {
     check_requirements
     load_profile
     update_brew
-    create_user
+    ask_for_user_creation
     install_software
     ask_for_ssh
     log "Setup completed successfully."
