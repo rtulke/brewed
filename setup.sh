@@ -15,6 +15,13 @@ NEW_USER_SHELL="/bin/zsh"
 #   ioreg -rd1 -c IOPlatformExpertDevice | awk -F'"' '/IOPlatformUUID/ {print $4}' | shasum -a 256 | awk '{print $1}'
 CURRENT_HARDWARE_HASH="$(ioreg -rd1 -c IOPlatformExpertDevice | awk -F'"' '/IOPlatformUUID/ {print $4}' | shasum -a 256 | awk '{print $1}')"
 
+# Taps whose repository is not named homebrew-<name> and therefore needs
+# its URL; formulae from other taps are tapped automatically when they are
+# listed with their full name (user/tap/formula).
+BREW_TAPS=(
+    "rtulke/checkmate https://github.com/rtulke/checkmate"
+)
+
 ## Hardening configuration
 # Settings of the hardening step (CIS Apple macOS benchmark, level 1, with
 # the deviations documented in the checkmate waiver file written below).
@@ -88,6 +95,8 @@ PROFILE_1_BREW_PINS=(
 PROFILE_2_HARDWARE_ID="3114d797c64da865ab8b6f65d68d1e6b82f6250c50d053efa9dc9dd3e0ce6dc1"
 PROFILE_2_CASKS=(
     adobe-creative-cloud
+    affinity
+    antigravity-cli
     balenaetcher
     basictex
     bitwarden
@@ -98,22 +107,31 @@ PROFILE_2_CASKS=(
     claude-code@latest
     codex
     devcleaner
+    displaylink
+    duckduckgo
+    firefox
     font-raleway
     gimp
     google-chrome
     google-earth-pro
+    hermes-desktop
+    intune-company-portal
     iterm2
+    kimi
     kindle-create
     kindle-previewer
+    macfuse
     microsoft-auto-update
     microsoft-teams
     mullvad-vpn
-    mweb-pro
     nordvpn
     obsidian
+    openvpn-connect
+    qflipper
     raspberry-pi-imager
     steam
     telegram
+    thinlinc-client
     threema@beta
     tor-browser
     transmit
@@ -126,7 +144,6 @@ PROFILE_2_CASKS=(
 
 PROFILE_2_FORMULAE=(
     ada-url
-    airsnare
     ansible
     aom
     arp-scan
@@ -139,12 +156,14 @@ PROFILE_2_FORMULAE=(
     certifi
     cffi
     cmake
+    colima
     container-compose
     coreutils
     cryptography
     dav1d
     deno
     diffutils
+    docker
     emacs
     ffmpeg
     flac
@@ -153,16 +172,17 @@ PROFILE_2_FORMULAE=(
     freetype
     fribidi
     gdk-pixbuf
-    gemini-cli
     gettext
     gh
     ghostscript
     giflib
+    git-filter-repo
     gitea
     glew
     glib
     gmp
     gnutls
+    go
     graphite2
     groff
     harfbuzz
@@ -177,8 +197,8 @@ PROFILE_2_FORMULAE=(
     imagemagick
     jasper
     jbig2dec
-    jq
     jpeg-turbo
+    jq
     json-c
     lame
     leptonica
@@ -199,10 +219,10 @@ PROFILE_2_FORMULAE=(
     libidn2
     libimagequant
     liblinear
+    libmagic
     libmaxminddb
     libnghttp2
     libnghttp3
-    libngtcp2
     libogg
     libpaper
     libpcap
@@ -222,8 +242,8 @@ PROFILE_2_FORMULAE=(
     libtiff
     libtool
     libudfread
-    libunistring
     libunibreak
+    libunistring
     libvmaf
     libvorbis
     libvpx
@@ -235,8 +255,9 @@ PROFILE_2_FORMULAE=(
     libxrender
     libyaml
     little-cms2
-    llvm
+    llama.cpp
     llhttp
+    llvm
     lua
     luajit
     lynx
@@ -249,6 +270,7 @@ PROFILE_2_FORMULAE=(
     mdv
     merve
     midnight-commander
+    minisign
     minizip
     molten-vk
     mpdecimal
@@ -271,20 +293,20 @@ PROFILE_2_FORMULAE=(
     pandoc
     pango
     pcre2
-    pcre2
     pillow
     pixman
     pkgconf
+    poppler
     psutils
     pwgen
     pycparser
     pydantic
     pytest
+    python-tk@3.14
     python@3.12
     python@3.13
     python@3.14
     readline
-    rename
     ripgrep
     rp
     rubberband
@@ -300,17 +322,17 @@ PROFILE_2_FORMULAE=(
     simdutf
     speexdsp
     sqlite
-    sshscan
     svt-av1
     tesseract
+    tmux
     tor
     tree
     tree-sitter
-    tree-sitter@0.25
     uchardet
     unbound
     uvwasi
     vapoursynth
+    vhs
     vulkan-headers
     vulkan-loader
     webp
@@ -327,6 +349,11 @@ PROFILE_2_FORMULAE=(
     z3
     zimg
     zstd
+    rtulke/airsnare/airsnare
+    rtulke/checkmate/checkmate
+    rtulke/redactor/redactor
+    rtulke/snooze/snooze
+    rtulke/sshscan/sshscan
 )
 
 PROFILE_2_MAS=(
@@ -338,6 +365,7 @@ PROFILE_2_MAS=(
     302584613     # Kindle
     441258766     # Magnet
     361304891     # Numbers
+    1403919533     # MWeb Pro (license bought in the App Store)
     1507139439     # One Markdown
     361309726     # Pages
     897118787     # Shazam
@@ -547,7 +575,18 @@ ask_for_user_creation() {
     create_user "$username" "$full_name"
 }
 
+setup_taps() {
+    local entry name url
+    for entry in "${BREW_TAPS[@]}"; do
+        name="${entry%% *}"
+        url="${entry#* }"
+        brew tap | grep -qx "$name" || brew tap "$name" "$url"
+    done
+}
+
 install_software() {
+    setup_taps
+
     if ((${#FORMULAE[@]})); then
         log "Installing Homebrew formulae"
         brew install "${FORMULAE[@]}"
