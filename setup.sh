@@ -370,7 +370,6 @@ PROFILE_2_MAS=(
     361309726      # Pages
     897118787      # Shazam
     1406961198     # SimpleClient
-    899247664      # TestFlight
     1450874784     # Transporter
     1230249825     # VMware Remote Console
     6447090616     # WhisperNotes
@@ -806,6 +805,7 @@ harden_system_preferences() {
         if [[ "$HARDENING_DRY_RUN" == "1" ]]; then
             printf '    [dry-run] sudo security authorizationdb write %s\n' "$right"
         else
+            # shellcheck disable=SC2024 # the plist is ours; only the write needs root
             sudo security -q authorizationdb write "$right" < "$work/$right.plist"
         fi
     done
