@@ -1099,9 +1099,7 @@ verify_hardening() {
     out="$HOME/checkmate-reports"
     mkdir -p "$out"
     log "CIS scan, reports in $out"
-    # --allow-insecure-policy: Homebrew installs the policies as the admin
-    # user; checkmate releases after 2.1.0 accept them without the flag.
-    sudo checkmate run "$policy" --allow-insecure-policy --waivers /etc/checkmate/waivers.yml -q \
+    sudo checkmate run "$policy" --waivers /etc/checkmate/waivers.yml -q \
         --export html,pdf,json -o "$out/cis-macos${m}-$(date +%Y%m%d)" || true
     sudo chown "$USER" "$out"/cis-macos"${m}"-*
     open "$out/cis-macos${m}-$(date +%Y%m%d).html" 2>/dev/null || true
