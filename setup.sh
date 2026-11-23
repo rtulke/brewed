@@ -358,24 +358,24 @@ PROFILE_2_FORMULAE=(
 
 PROFILE_2_MAS=(
     1193539993     # Brother iPrint&Scan
-    682658836     # GarageBand
+    682658836      # GarageBand
     1351639930     # Gifski
-    408981434     # iMovie
-    361285480     # Keynote
-    302584613     # Kindle
-    441258766     # Magnet
-    361304891     # Numbers
+    408981434      # iMovie
+    361285480      # Keynote
+    302584613      # Kindle
+    441258766      # Magnet
+    361304891      # Numbers
     1403919533     # MWeb Pro (license bought in the App Store)
     1507139439     # One Markdown
-    361309726     # Pages
-    897118787     # Shazam
+    361309726      # Pages
+    897118787      # Shazam
     1406961198     # SimpleClient
-    899247664     # TestFlight
+    899247664      # TestFlight
     1450874784     # Transporter
     1230249825     # VMware Remote Console
     6447090616     # WhisperNotes
     1451685025     # WireGuard
-    497799835     # Xcode
+    497799835      # Xcode
 )
 
 PROFILE_2_BREW_PINS=()
